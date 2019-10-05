@@ -1,0 +1,11 @@
+
+rootProject.name = 'Universal API-Tester'
+
+include("starter")
+include("application")
+include("domain")
+include("primary-adapter")
+include("primary-port")
+include("secondary-adapter")
+include("secondary-port")
+

@@ -1,0 +1,29 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+.gradle-home
+.attach_*
+
+# Ignore Gradle/Idea/Eclipse build output directory
+build/
+out/
+bin/
+
+# docker storage for testing
+docker/volumes/
+
+# Ignore Intellij Idea specific directories
+.idea
+*.iml
+*.iws
+*.ipr
+
+# Ignore Eclipse specific things
+.settings
+.project
+.classpath
+.factorypath
+.apt_generated
+.apt_generated_test
+
+# Ignore OSX cache folder
+.DS_Store

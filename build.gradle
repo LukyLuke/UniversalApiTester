@@ -1,0 +1,111 @@
+buildscript {
+	ext {
+		springboot = "2.1.9.RELEASE"
+		spring = "5.1.0.RELEASE"
+		
+		activemq = "5.15.10"
+		jackson = "2.10.0"
+		
+		jupiter = "5.4.2"
+		assertj = "3.13.2"
+		mockito = "3.1.0"
+	}
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springboot}")
+	}
+}
+
+allprojects {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+	apply plugin: 'io.spring.dependency-management'
+
+	repositories {
+        mavenCentral()
+    }
+	
+	dependencies {
+		implementation("org.springframework:spring-context:${spring}")
+		
+		testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiter}")
+		testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiter}")
+		testImplementation("org.assertj:assertj-core:${assertj}")
+		testImplementation("org.mockito:mockito-core:${mockito}")
+	}
+	
+	test {
+		useJUnitPlatform()
+	}
+}
+
+subprojects {
+	project(":primary-adapter").dependencies {
+		implementation("org.springframework:spring-context:${spring}")
+	}
+	project(":primary-port").dependencies {
+		implementation("org.springframework.boot:spring-boot-starter-web:${springboot}")
+		implementation("com.fasterxml.jackson.core:jackson-databind:${jackson}")
+		
+		implementation("org.springframework.boot:spring-boot-starter-activemq:${springboot}")
+		implementation("org.springframework:spring-jms:${spring}")
+		implementation("org.apache.activemq:activemq-client:${activemq}")
+		
+		implementation project(":primary-adapter")
+		implementation project(":application")
+		implementation project(":domain")
+		implementation project(":secondary-port")
+	}
+	project(":application").dependencies {
+		implementation project(":domain")
+	}
+	project(":secondary-adapter").dependencies {
+		implementation("org.springframework:spring-context:${spring}")
+	}
+	project(":secondary-port").dependencies {
+		implementation("org.springframework.boot:spring-boot-starter-activemq:${springboot}")
+		implementation("org.springframework:spring-jms:${spring}")
+		implementation("org.apache.activemq:activemq-broker:${activemq}")
+		
+		runtime("org.springframework:spring-jms:${spring}")
+		
+		implementation project(":secondary-adapter")
+		implementation project(":application")
+		implementation project(":domain")
+	}
+	
+	project(":starter") {
+		apply plugin: "application"
+		apply plugin: 'org.springframework.boot'
+
+		dependencies {
+			compile(project(":domain"))
+			compile(project(":application"))
+			compile(project(":secondary-port"))
+			compile(project(":secondary-adapter"))
+			compile(project(":primary-adapter"))
+			compile(project(":primary-port"))
+			
+			implementation("org.springframework.boot:spring-boot-starter:${springboot}")
+		}
+		application {
+			mainClassName = 'ch.ranta.universal.tester.App'
+		}
+		
+		bootJar {
+			baseName = 'universal-api-tester'
+			version =  '0.1.0'
+		}
+	}
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+group = 'ch.ranta'
+version = '0.1.0'
+
