@@ -4,7 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,10 +18,10 @@ public class Call {
 		this.service = service;
 	}
 	
-	@RequestMapping("/jms/jms/{topic}/{message}")
-	public String create(@PathVariable("topic") String topic, @PathVariable("message") String message) {
+	@PostMapping("/jms/jms/{send}/{read}")
+	public String create(@RequestBody String message, @PathVariable("send") String send, @PathVariable("send") String read) {
 		try {
-			return service.sendAndWait(topic, message);
+			return service.sendAndWait(send, read, message);
 		} catch (InterruptedException e) {
 			LOGGER.debug("Exception: ", e);
 		}

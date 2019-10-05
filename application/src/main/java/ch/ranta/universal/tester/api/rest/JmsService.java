@@ -20,10 +20,10 @@ public class JmsService {
 		this.receiver = receiver;
 	}
 	
-	public String sendAndWait(String destination, String message) throws InterruptedException {
-		sender.send(destination, message);
+	public String sendAndWait(String send, String read, String message) throws InterruptedException {
+		sender.send(send, message);
 		Optional<Object> result;
-		while (!(result = receiver.receive(destination)).isPresent()) {
+		while (!(result = receiver.receive(read)).isPresent()) {
 			TimeUnit.MILLISECONDS.sleep(5);
 		}
 		return result.get().toString();
