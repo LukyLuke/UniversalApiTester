@@ -1,6 +1,8 @@
 package ch.ranta.universal.tester.api.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 
@@ -35,6 +37,24 @@ public class CallTest {
 		String message = "MESSAGE";
 
 		JmsService service = new JmsService(10, (q, m) -> {}, (q) -> Optional.empty());
+		
+		// When
+		String result = new Call(service).create(message, sendQueue, readQueue);
+		
+		// Then
+		assertThat(result).isEqualTo(expectedResult);
+	}
+	
+	@Test
+	void testCreate_Exception() throws Exception {
+		// Given
+		String expectedResult = "ERROR";
+		String readQueue = "READ_FROM";
+		String sendQueue = "SEND_TO";
+		String message = "MESSAGE";
+		
+		JmsService service = mock(JmsService.class);
+		doThrow(InterruptedException.class).when(service).sendAndWait(sendQueue, readQueue, message);
 		
 		// When
 		String result = new Call(service).create(message, sendQueue, readQueue);

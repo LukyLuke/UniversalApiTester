@@ -24,14 +24,34 @@ allprojects {
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
 	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'jacoco'
 
 	repositories {
         mavenCentral()
     }
+}
+
+task codeCoverageReport(type: JacocoReport) {
+	// Gather execution data from all subprojects
+	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 	
-	test {
-		useJUnitPlatform()
+	// Add all relevant sourcesets from the subprojects 
+	subprojects.each {
+		sourceSets it.sourceSets.main
 	}
+	
+	reports {
+		xml.enabled true
+		xml.destination file("${rootDir}/build/reports/jacoco/combined.xml")
+		html.enabled true
+		html.destination file("${rootDir}/build/reports/jacoco")
+		csv.enabled false
+	}
+}
+
+// always run the tests before generating the report
+codeCoverageReport.dependsOn {
+	subprojects*.test
 }
 
 subprojects {
@@ -40,6 +60,7 @@ subprojects {
 		
 		testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${jupiter}")
 		testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiter}")
+		testImplementation("org.junit.jupiter:junit-jupiter-params:${jupiter}")
 		testImplementation("org.assertj:assertj-core:${assertj}")
 		testImplementation("org.mockito:mockito-core:${mockito}")
 	}
@@ -99,6 +120,21 @@ subprojects {
 			version =  '0.1.0'
 		}
 	}
+	
+	test {
+		useJUnitPlatform()
+		finalizedBy jacocoTestCoverageVerification, codeCoverageReport
+	}
+	
+	jacocoTestCoverageVerification {
+		violationRules {
+			rule {
+				limit {
+					minimum = "0.9".toBigDecimal()
+				}
+			}
+		}
+	}
 }
 
 sourceCompatibility = '11'
@@ -106,4 +142,3 @@ targetCompatibility = '11'
 
 group = 'ch.ranta'
 version = '0.1.0'
-

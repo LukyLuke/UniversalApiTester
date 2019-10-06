@@ -12,6 +12,14 @@ public class SenderConfig {
 	@Value("${activemq.broker-url}")
 	private String brokerUrl;
 
+	/**
+	 * For testing.
+	 */
+	SenderConfig setBrokerUrl(String brokerUrl) {
+		this.brokerUrl = brokerUrl;
+		return this;
+	}
+	
 	@Bean
 	public ActiveMQConnectionFactory senderActiveMQConnectionFactory() {
 		ActiveMQConnectionFactory amqConnectionFactory = new ActiveMQConnectionFactory();

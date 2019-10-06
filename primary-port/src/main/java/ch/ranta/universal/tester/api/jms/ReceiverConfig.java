@@ -20,6 +20,14 @@ public class ReceiverConfig implements JmsListenerConfigurer {
 
 	private JmsListenerEndpointRegistrar registrar;
 
+	/**
+	 * For testing.
+	 */
+	ReceiverConfig setBrokerUrl(String brokerUrl) {
+		this.brokerUrl = brokerUrl;
+		return this;
+	}
+	
 	@Bean
 	public ActiveMQConnectionFactory receiverActiveMQConnectionFactory() {
 		ActiveMQConnectionFactory amqConnectionFactory = new ActiveMQConnectionFactory();

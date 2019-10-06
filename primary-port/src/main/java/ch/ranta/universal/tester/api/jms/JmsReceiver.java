@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JmsReceiver implements Receiver {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JmsReceiver.class);
-	private Queue<Object> messages = new LinkedList<Object>();
-	private ReceiverConfig config;
+	private final Queue<Object> messages = new LinkedList<Object>();
+	private final ReceiverConfig config;
 
 	@Autowired
 	public JmsReceiver(ReceiverConfig config) {
