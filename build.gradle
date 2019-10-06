@@ -29,6 +29,12 @@ allprojects {
         mavenCentral()
     }
 	
+	test {
+		useJUnitPlatform()
+	}
+}
+
+subprojects {
 	dependencies {
 		implementation("org.springframework:spring-context:${spring}")
 		
@@ -37,15 +43,8 @@ allprojects {
 		testImplementation("org.assertj:assertj-core:${assertj}")
 		testImplementation("org.mockito:mockito-core:${mockito}")
 	}
-	
-	test {
-		useJUnitPlatform()
-	}
-}
 
-subprojects {
 	project(":primary-adapter").dependencies {
-		implementation("org.springframework:spring-context:${spring}")
 	}
 	project(":primary-port").dependencies {
 		implementation("org.springframework.boot:spring-boot-starter-web:${springboot}")
@@ -64,7 +63,6 @@ subprojects {
 		implementation project(":domain")
 	}
 	project(":secondary-adapter").dependencies {
-		implementation("org.springframework:spring-context:${spring}")
 	}
 	project(":secondary-port").dependencies {
 		implementation("org.springframework.boot:spring-boot-starter-activemq:${springboot}")
