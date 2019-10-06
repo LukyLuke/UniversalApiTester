@@ -5,6 +5,7 @@ buildscript {
 		
 		activemq = "5.15.10"
 		jackson = "2.10.0"
+		lombok = "1.18.10"
 		
 		jupiter = "5.4.2"
 		assertj = "3.13.2"
@@ -66,6 +67,8 @@ subprojects {
 	}
 
 	project(":primary-adapter").dependencies {
+		compileOnly("org.projectlombok:lombok:${lombok}")
+		annotationProcessor("org.projectlombok:lombok:${lombok}")
 	}
 	project(":primary-port").dependencies {
 		implementation("org.springframework.boot:spring-boot-starter-web:${springboot}")
@@ -84,6 +87,8 @@ subprojects {
 		implementation project(":domain")
 	}
 	project(":secondary-adapter").dependencies {
+		compileOnly("org.projectlombok:lombok:${lombok}")
+		annotationProcessor("org.projectlombok:lombok:${lombok}")
 	}
 	project(":secondary-port").dependencies {
 		implementation("org.springframework.boot:spring-boot-starter-activemq:${springboot}")
@@ -95,6 +100,10 @@ subprojects {
 		implementation project(":secondary-adapter")
 		implementation project(":application")
 		implementation project(":domain")
+	}
+	project(":domain").dependencies {
+		compileOnly("org.projectlombok:lombok:${lombok}")
+		annotationProcessor("org.projectlombok:lombok:${lombok}")
 	}
 	
 	project(":starter") {

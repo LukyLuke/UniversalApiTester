@@ -1,13 +1,21 @@
 package ch.ranta.universal.tester.api.rest;
 
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.ranta.universal.tester.api.dto.Response;
+import ch.ranta.universal.tester.domain.entities.ApiResponse;
 import ch.ranta.universal.tester.service.JmsService;
 
 @RestController
@@ -20,14 +28,25 @@ public class Call {
 		this.service = service;
 	}
 	
-	@PostMapping("/jms/jms/{send}/{read}")
-	public String create(@RequestBody String message, @PathVariable("send") String send, @PathVariable("send") String read) {
+	@RequestMapping(
+			method= RequestMethod.POST,
+			value = "/jms/jms/{send}/{read}",
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public ResponseEntity<Response> create(@RequestBody String message, @PathVariable("send") String send, @PathVariable("send") String read) {
 		try {
-			return service.sendAndWait(send, read, message);
+			long start = System.nanoTime();
+			ApiResponse result = service.sendAndWait(send, read, message);
+
+			Response response = new Response();
+			response.setMessage(result.getMessage());
+			response.setMessageId(result.getId());
+			response.setRtt(System.nanoTime() - start);
+			
+			return new ResponseEntity<>(response, Objects.isNull(result.getMessage()) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
 		} catch (InterruptedException e) {
 			LOGGER.debug("Exception: ", e);
 		}
-		return "ERROR";
+		return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 	}
 	
 }

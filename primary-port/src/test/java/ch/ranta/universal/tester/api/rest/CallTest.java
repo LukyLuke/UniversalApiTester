@@ -5,9 +5,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import ch.ranta.universal.tester.api.dto.Response;
+import ch.ranta.universal.tester.domain.entities.ApiResponse;
 import ch.ranta.universal.tester.service.JmsService;
 
 public class CallTest {
@@ -15,23 +20,30 @@ public class CallTest {
 	@Test
 	void testCreate_Success() {
 		// Given
-		String expectedResult = "RESULT";
 		String readQueue = "READ_FROM";
 		String sendQueue = "SEND_TO";
 		String message = "MESSAGE";
+		
+		HttpStatus expectedStatus = HttpStatus.OK;
+		ApiResponse expectedResult = new ApiResponse();
+		expectedResult.setMessage("RESPONSE");
+		expectedResult.setId("UUID-MESSAGE-ID");
 		JmsService service = new JmsService((q, m) -> {}, (q) -> Optional.of(expectedResult));
 		
 		// When
-		String result = new Call(service).create(message, sendQueue, readQueue);
+		ResponseEntity<Response> result = new Call(service).create(message, sendQueue, readQueue);
 		
 		// Then
-		assertThat(result).isEqualTo(expectedResult);
+		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
+		assertThat(result.getBody().getMessage()).isEqualTo(expectedResult.getMessage());
+		assertThat(result.getBody().getMessageId()).isEqualTo(expectedResult.getId());
+		assertThat(result.getBody().getRtt()).isGreaterThan(0);
 	}
 	
 	@Test
 	void testCreate_Failed() throws Exception {
 		// Given
-		String expectedResult = "TIMEOUT";
+		HttpStatus expectedStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		String readQueue = "READ_FROM";
 		String sendQueue = "SEND_TO";
 		String message = "MESSAGE";
@@ -39,16 +51,16 @@ public class CallTest {
 		JmsService service = new JmsService(10, (q, m) -> {}, (q) -> Optional.empty());
 		
 		// When
-		String result = new Call(service).create(message, sendQueue, readQueue);
+		ResponseEntity<Response> result = new Call(service).create(message, sendQueue, readQueue);
 		
 		// Then
-		assertThat(result).isEqualTo(expectedResult);
+		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
 	}
 	
 	@Test
 	void testCreate_Exception() throws Exception {
 		// Given
-		String expectedResult = "ERROR";
+		HttpStatus expectedStatus = HttpStatus.GATEWAY_TIMEOUT;
 		String readQueue = "READ_FROM";
 		String sendQueue = "SEND_TO";
 		String message = "MESSAGE";
@@ -57,10 +69,9 @@ public class CallTest {
 		doThrow(InterruptedException.class).when(service).sendAndWait(sendQueue, readQueue, message);
 		
 		// When
-		String result = new Call(service).create(message, sendQueue, readQueue);
+		ResponseEntity<Response> result = new Call(service).create(message, sendQueue, readQueue);
 		
 		// Then
-		assertThat(result).isEqualTo(expectedResult);
+		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
 	}
-
 }

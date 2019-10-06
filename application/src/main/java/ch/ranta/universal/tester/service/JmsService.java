@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 import ch.ranta.universal.tester.api.jms.Receiver;
 import ch.ranta.universal.tester.api.jms.Sender;
+import ch.ranta.universal.tester.domain.entities.ApiResponse;
 
 @Component
 public class JmsService {
-	private static final String TIMEOUT_RESULT = "TIMEOUT";
 	private static int MAX_READ_MILLISECONDS = 1000;
 	private final static int PAUSE_READ_MILLISECONDS = 5;
 	
@@ -32,14 +32,14 @@ public class JmsService {
 		MAX_READ_MILLISECONDS = maxTimeout;
 	}
 	
-	public String sendAndWait(String send, String read, String message) throws InterruptedException {
+	public ApiResponse sendAndWait(String send, String read, String message) throws InterruptedException {
 		int timeout = MAX_READ_MILLISECONDS;
 		sender.send(send, message);
 
-		Optional<Object> result;
+		Optional<ApiResponse> result;
 		while (!(result = receiver.receive(read)).isPresent() && ((timeout -= PAUSE_READ_MILLISECONDS) > 0)) {
 			TimeUnit.MILLISECONDS.sleep(PAUSE_READ_MILLISECONDS);
 		}
-		return result.orElse(TIMEOUT_RESULT).toString();
+		return result.orElse(new ApiResponse());
 	}
 }

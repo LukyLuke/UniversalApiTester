@@ -7,13 +7,15 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
 
-import javax.jms.Message;
+import javax.jms.TextMessage;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.jms.config.SimpleJmsListenerEndpoint;
+
+import ch.ranta.universal.tester.domain.entities.ApiResponse;
 
 public class JmsReceiverTest {
 
@@ -24,7 +26,7 @@ public class JmsReceiverTest {
 		ReceiverConfig config = mock(ReceiverConfig.class);
 		
 		// When
-		Optional<Object> result = new JmsReceiver(config).receive(destination);
+		Optional<ApiResponse> result = new JmsReceiver(config).receive(destination);
 		
 		// Then
 		verify(config).registerJmsEndpoint(ArgumentMatchers.any());
@@ -41,13 +43,13 @@ public class JmsReceiverTest {
 			public Void answer(InvocationOnMock invocation) throws Throwable {
 				((SimpleJmsListenerEndpoint)invocation.getArgument(0))
 					.getMessageListener()
-					.onMessage(mock(Message.class));
+					.onMessage(mock(TextMessage.class));
 				return null;
 			}
 		}).when(config).registerJmsEndpoint(ArgumentMatchers.any());
 		
 		// When
-		Optional<Object> result = new JmsReceiver(config).receive(destination);
+		Optional<ApiResponse> result = new JmsReceiver(config).receive(destination);
 		
 		// Then
 		verify(config).registerJmsEndpoint(ArgumentMatchers.any());
