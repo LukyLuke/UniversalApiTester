@@ -5,7 +5,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,7 @@ import ch.ranta.universal.tester.api.dto.Response;
 import ch.ranta.universal.tester.domain.entities.ApiResponse;
 import ch.ranta.universal.tester.service.JmsService;
 
-public class CallTest {
+public class JmsJmsTest {
 	
 	@Test
 	void testCreate_Success() {
@@ -31,7 +30,7 @@ public class CallTest {
 		JmsService service = new JmsService((q, m) -> {}, (q) -> Optional.of(expectedResult));
 		
 		// When
-		ResponseEntity<Response> result = new Call(service).create(message, sendQueue, readQueue);
+		ResponseEntity<Response> result = new JmsJms(service).create(message, sendQueue, readQueue);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
@@ -51,7 +50,7 @@ public class CallTest {
 		JmsService service = new JmsService(10, (q, m) -> {}, (q) -> Optional.empty());
 		
 		// When
-		ResponseEntity<Response> result = new Call(service).create(message, sendQueue, readQueue);
+		ResponseEntity<Response> result = new JmsJms(service).create(message, sendQueue, readQueue);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
@@ -69,7 +68,7 @@ public class CallTest {
 		doThrow(InterruptedException.class).when(service).sendAndWait(sendQueue, readQueue, message);
 		
 		// When
-		ResponseEntity<Response> result = new Call(service).create(message, sendQueue, readQueue);
+		ResponseEntity<Response> result = new JmsJms(service).create(message, sendQueue, readQueue);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);

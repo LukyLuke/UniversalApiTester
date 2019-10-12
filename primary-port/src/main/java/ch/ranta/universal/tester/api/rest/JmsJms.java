@@ -19,12 +19,12 @@ import ch.ranta.universal.tester.domain.entities.ApiResponse;
 import ch.ranta.universal.tester.service.JmsService;
 
 @RestController
-public class Call {
-	private final static Logger LOGGER = LoggerFactory.getLogger(Call.class);
+public class JmsJms {
+	private final static Logger LOGGER = LoggerFactory.getLogger(JmsJms.class);
 	private JmsService service;
 
 	@Autowired
-	public Call(JmsService service) {
+	public JmsJms(JmsService service) {
 		this.service = service;
 	}
 	
