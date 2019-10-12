@@ -54,6 +54,7 @@ public class JmsServiceTest {
 		String message = "MESSAGE";
 		
 		Sender sender = mock(Sender.class);
+		when(sender.send(send, message)).thenReturn(true);
 		Receiver receiver = mock(Receiver.class);
 		
 		// When
@@ -76,6 +77,7 @@ public class JmsServiceTest {
 		response.setMessage(message);
 		
 		Sender sender = mock(Sender.class);
+		when(sender.send(send, message)).thenReturn(true);
 		Receiver receiver = mock(Receiver.class);
 		when(receiver.receive(read)).thenReturn(Optional.of(response));
 		
