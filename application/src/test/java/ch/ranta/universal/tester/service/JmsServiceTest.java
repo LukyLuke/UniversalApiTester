@@ -17,6 +17,36 @@ import ch.ranta.universal.tester.domain.entities.ApiResponse;
 public class JmsServiceTest {
 
 	@Test
+	public void testJmsService_Send() throws Exception {
+		// Given
+		String send = "SEND";
+		String message = "MESSAGE";
+		
+		Sender sender = mock(Sender.class);
+		
+		// When
+		new JmsService(10, sender, null).send(send, message);
+		
+		// Then
+		verify(sender).send(send, message);
+	}
+	
+	@Test
+	public void testJmsService_Receive() throws Exception {
+		// Given
+		String read = "READ";
+		
+		Receiver receiver = mock(Receiver.class);
+		
+		// When
+		ApiResponse result = new JmsService(10, null, receiver).receive(read);
+		
+		// Then
+		verify(receiver, times(2)).receive(read);
+		assertThat(result.getMessage()).isNull();
+	}
+	
+	@Test
 	public void testJmsServiceIntSenderReceiver() throws Exception {
 		// Given
 		String send = "SEND";

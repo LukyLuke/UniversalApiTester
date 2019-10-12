@@ -33,13 +33,20 @@ public class JmsService {
 	}
 	
 	public ApiResponse sendAndWait(String send, String read, String message) throws InterruptedException {
-		int timeout = MAX_READ_MILLISECONDS;
-		sender.send(send, message);
+		send(send, message);
+		return receive(read);
+	}
 
+	public ApiResponse receive(String read) throws InterruptedException {
+		int timeout = MAX_READ_MILLISECONDS;
 		Optional<ApiResponse> result;
 		while (!(result = receiver.receive(read)).isPresent() && ((timeout -= PAUSE_READ_MILLISECONDS) > 0)) {
 			TimeUnit.MILLISECONDS.sleep(PAUSE_READ_MILLISECONDS);
 		}
 		return result.orElse(new ApiResponse());
+	}
+
+	public void send(String send, String message) {
+		sender.send(send, message);
 	}
 }
