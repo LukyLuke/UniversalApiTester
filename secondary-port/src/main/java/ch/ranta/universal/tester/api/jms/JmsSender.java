@@ -2,6 +2,7 @@ package ch.ranta.universal.tester.api.jms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 
 import ch.ranta.universal.tester.api.jms.Sender;
@@ -15,8 +16,14 @@ public class JmsSender implements Sender {
 	}
 	
 	@Override
-	public void send(String destinationName, String message) {
+	public boolean send(String destinationName, String message) {
 		LOGGER.error("Sending message='{}'", message);
-		this.template.convertAndSend(destinationName, message);
+		try {
+			this.template.convertAndSend(destinationName, message);
+			return true;
+		} catch (JmsException e) {
+			LOGGER.error("Exception: {}", e);
+		}
+		return false;
 	}
 }

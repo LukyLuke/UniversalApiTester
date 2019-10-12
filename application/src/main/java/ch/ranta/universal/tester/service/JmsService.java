@@ -33,8 +33,10 @@ public class JmsService {
 	}
 	
 	public ApiResponse sendAndWait(String send, String read, String message) throws InterruptedException {
-		send(send, message);
-		return receive(read);
+		if (send(send, message)) {
+			return receive(read);
+		}
+		return new ApiResponse();
 	}
 
 	public ApiResponse receive(String read) throws InterruptedException {
@@ -46,7 +48,7 @@ public class JmsService {
 		return result.orElse(new ApiResponse());
 	}
 
-	public void send(String send, String message) {
-		sender.send(send, message);
+	public boolean send(String send, String message) {
+		return sender.send(send, message);
 	}
 }
