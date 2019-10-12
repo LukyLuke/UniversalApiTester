@@ -32,7 +32,7 @@ public class JmsJms {
 			method= RequestMethod.POST,
 			value = "/jms/jms/{send}/{read}",
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Response> create(@RequestBody String message, @PathVariable("send") String send, @PathVariable("send") String read) {
+	public ResponseEntity<Response> create(@RequestBody String message, @PathVariable("send") String send, @PathVariable("read") String read) {
 		try {
 			long start = System.nanoTime();
 			ApiResponse result = service.sendAndWait(send, read, message);
