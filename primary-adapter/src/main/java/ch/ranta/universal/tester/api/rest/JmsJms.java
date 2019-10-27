@@ -14,45 +14,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.ranta.universal.tester.api.Creator;
 import ch.ranta.universal.tester.api.dto.Response;
 import ch.ranta.universal.tester.domain.entities.ApiResponse;
-import ch.ranta.universal.tester.service.GrpcService;
 import ch.ranta.universal.tester.service.JmsService;
 
 @RestController
-public class GrpcJms {
-	private final static Logger LOGGER = LoggerFactory.getLogger(GrpcJms.class);
-	private JmsService jmsService;
-	private GrpcService grpcService;
+public class JmsJms implements Creator {
+	private final static Logger LOGGER = LoggerFactory.getLogger(JmsJms.class);
+	private JmsService service;
 
 	@Autowired
-	public GrpcJms(GrpcService grpcService, JmsService jmsService) {
-		this.grpcService = grpcService;
-		this.jmsService = jmsService;
+	public JmsJms(JmsService service) {
+		this.service = service;
 	}
-
+	
+	@Override
 	@RequestMapping(
 			method= RequestMethod.POST,
-			value = "/grpc/jms/{read}",
+			value = "/jms/jms/{send}/{read}",
 			produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public ResponseEntity<Response> create(@RequestBody String message, @PathVariable("read") String read) {
+	public ResponseEntity<Response> create(@RequestBody String message, @PathVariable("send") String send, @PathVariable("read") String read) {
 		try {
 			long start = System.nanoTime();
+			ApiResponse result = service.sendAndWait(send, read, message);
+
 			Response response = new Response();
-			
-			if (grpcService.send(message)) {
-				ApiResponse result = jmsService.receive(read);
-				
-				response.setMessage(result.getMessage());
-				response.setMessageId(result.getId());
-			}
+			response.setMessage(result.getMessage());
+			response.setMessageId(result.getId());
 			response.setRtt(System.nanoTime() - start);
 			
-			return new ResponseEntity<>(response, Objects.isNull(response.getMessage()) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
+			return new ResponseEntity<>(response, Objects.isNull(result.getMessage()) ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.OK);
 		} catch (InterruptedException e) {
 			LOGGER.debug("Exception: ", e);
 		}
 		return new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT);
 	}
-
+	
 }

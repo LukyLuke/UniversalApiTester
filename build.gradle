@@ -4,6 +4,7 @@ buildscript {
 		spring = "5.1.0.RELEASE"
 		
 		activemq = "5.15.10"
+		protobuf = "3.10.0"
 		jackson = "2.10.0"
 		lombok = "1.18.10"
 		
@@ -67,38 +68,58 @@ subprojects {
 	}
 
 	project(":primary-adapter").dependencies {
+		implementation project(":primary-port")
+		implementation project(":secondary-adapter")
+		implementation project(":application")
+		implementation project(":domain")
+
 		compileOnly("org.projectlombok:lombok:${lombok}")
 		annotationProcessor("org.projectlombok:lombok:${lombok}")
-	}
-	project(":primary-port").dependencies {
+		
 		implementation("org.springframework.boot:spring-boot-starter-web:${springboot}")
 		implementation("com.fasterxml.jackson.core:jackson-databind:${jackson}")
 		
 		implementation("org.springframework.boot:spring-boot-starter-activemq:${springboot}")
 		implementation("org.springframework:spring-jms:${spring}")
 		implementation("org.apache.activemq:activemq-client:${activemq}")
-		
-		implementation project(":primary-adapter")
+	}
+	project(":primary-port").dependencies {
 		implementation project(":application")
 		implementation project(":domain")
-		implementation project(":secondary-port")
-	}
-	project(":application").dependencies {
-		implementation project(":domain")
-	}
-	project(":secondary-adapter").dependencies {
+
 		compileOnly("org.projectlombok:lombok:${lombok}")
 		annotationProcessor("org.projectlombok:lombok:${lombok}")
+		
+		implementation("org.springframework.boot:spring-boot-starter-web:${springboot}")
 	}
-	project(":secondary-port").dependencies {
+
+	project(":secondary-adapter").dependencies {
+		implementation project(":secondary-port")
+		implementation project(":application")
+		implementation project(":domain")
+		
+		compileOnly("org.projectlombok:lombok:${lombok}")
+		annotationProcessor("org.projectlombok:lombok:${lombok}")
+
 		implementation("org.springframework.boot:spring-boot-starter-activemq:${springboot}")
 		implementation("org.springframework:spring-jms:${spring}")
 		implementation("org.apache.activemq:activemq-broker:${activemq}")
+		implementation("com.google.protobuf:protobuf-java:${protobuf}")
 		
 		runtime("org.springframework:spring-jms:${spring}")
 		
-		implementation project(":secondary-adapter")
+	}
+	project(":secondary-port").dependencies {
 		implementation project(":application")
+		implementation project(":domain")
+
+		compileOnly("org.projectlombok:lombok:${lombok}")
+		annotationProcessor("org.projectlombok:lombok:${lombok}")
+
+		implementation("com.google.protobuf:protobuf-java:${protobuf}")
+	}
+
+	project(":application").dependencies {
 		implementation project(":domain")
 	}
 	project(":domain").dependencies {

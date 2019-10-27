@@ -4,12 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import ch.ranta.universal.tester.api.dto.JsonDto;
 import ch.ranta.universal.tester.api.dto.Response;
 import ch.ranta.universal.tester.domain.entities.ApiResponse;
 import ch.ranta.universal.tester.service.GrpcService;
@@ -21,7 +25,8 @@ public class GrpcJmsTest {
 		// Given
 		HttpStatus expectedStatus = HttpStatus.OK;
 		String readQueue = "READ_FROM";
-		String message = "MESSAGE";
+		List<JsonDto> message = new ArrayList<>();
+		message.add(new JsonDto(1, "NAME"));
 		
 		ApiResponse expectedResult = new ApiResponse();
 		expectedResult.setMessage("RESPONSE");
@@ -31,7 +36,7 @@ public class GrpcJmsTest {
 		GrpcService grpcService = new GrpcService((m) -> true, null);
 		
 		// When
-		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue);
+		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue, null);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
@@ -45,7 +50,8 @@ public class GrpcJmsTest {
 		// Given
 		HttpStatus expectedStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		String readQueue = "READ_FROM";
-		String message = "MESSAGE";
+		List<JsonDto> message = new ArrayList<>();
+		message.add(new JsonDto(1, "NAME"));
 		
 		ApiResponse expectedResult = new ApiResponse();
 		expectedResult.setMessage("RESPONSE");
@@ -55,7 +61,7 @@ public class GrpcJmsTest {
 		GrpcService grpcService = new GrpcService((m) -> false, null);
 		
 		// When
-		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue);
+		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue, null);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
@@ -66,13 +72,14 @@ public class GrpcJmsTest {
 		// Given
 		HttpStatus expectedStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		String readQueue = "READ_FROM";
-		String message = "MESSAGE";
+		List<JsonDto> message = new ArrayList<>();
+		message.add(new JsonDto(1, "NAME"));
 
 		JmsService jmsService = new JmsService(10, null, (q) -> Optional.empty());
 		GrpcService grpcService = new GrpcService((m) -> true, null);
 		
 		// When
-		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue);
+		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue, null);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
@@ -83,7 +90,8 @@ public class GrpcJmsTest {
 		// Given
 		HttpStatus expectedStatus = HttpStatus.GATEWAY_TIMEOUT;
 		String readQueue = "READ_FROM";
-		String message = "MESSAGE";
+		List<JsonDto> message = new ArrayList<>();
+		message.add(new JsonDto(1, "NAME"));
 		
 		ApiResponse expectedResult = new ApiResponse();
 		expectedResult.setMessage("RESPONSE");
@@ -92,10 +100,10 @@ public class GrpcJmsTest {
 		JmsService jmsService = new JmsService(null, (q) -> Optional.of(expectedResult));
 		
 		GrpcService grpcService = mock(GrpcService.class);
-		doThrow(InterruptedException.class).when(grpcService).send(message);
+		doThrow(InterruptedException.class).when(grpcService).send(ArgumentMatchers.anyList());
 		
 		// When
-		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue);
+		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue, null);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
@@ -106,7 +114,8 @@ public class GrpcJmsTest {
 		// Given
 		HttpStatus expectedStatus = HttpStatus.GATEWAY_TIMEOUT;
 		String readQueue = "READ_FROM";
-		String message = "MESSAGE";
+		List<JsonDto> message = new ArrayList<>();
+		message.add(new JsonDto(1, "NAME"));
 		
 		JmsService jmsService = mock(JmsService.class);
 		doThrow(InterruptedException.class).when(jmsService).receive(readQueue);
@@ -114,7 +123,7 @@ public class GrpcJmsTest {
 		GrpcService grpcService = new GrpcService((m) -> true, null);
 		
 		// When
-		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue);
+		ResponseEntity<Response> result = new GrpcJms(grpcService, jmsService).create(message, readQueue, null);
 		
 		// Then
 		assertThat(result.getStatusCode()).isEqualTo(expectedStatus);
