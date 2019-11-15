@@ -1,5 +1,7 @@
 package ch.ranta.universal.tester.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +21,7 @@ public class JsonEntity {
 	private Double doubleValue;
 	private Float floatValue;
 	
-	private JsonEntity objectValue;
+	private List<JsonEntity> objectValue;
 	
 	private Integer int32Value;
 	private Integer uint32Value;

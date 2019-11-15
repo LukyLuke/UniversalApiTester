@@ -9,7 +9,8 @@ import ch.ranta.universal.tester.dto.JsonEntity;
 
 public class JsonDtoMapper {
 	public static List<JsonEntity> buildJsonEntityList(List<JsonDto> message) {
-		return message.stream()
+		return Objects.isNull(message) ? null :
+			message.stream()
 				.map(JsonDtoMapper::buildEntity)
 				.collect(Collectors.toList());
 	}
@@ -37,7 +38,7 @@ public class JsonDtoMapper {
 				.sint64Value(dto.getSint64Value())
 				.int64Value(dto.getInt64Value())
 				
-				.objectValue(buildEntity(dto.getObjectValue()))
+				.objectValue(buildJsonEntityList(dto.getObjectValue()))
 				
 				.build();
 	}

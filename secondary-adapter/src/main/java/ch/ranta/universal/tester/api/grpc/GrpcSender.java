@@ -29,13 +29,22 @@ public class GrpcSender implements Sender {
 	private static final int HTTP_STATUS_OK = 200;
 	private static final String GRPC_STATUS_OK = "0";
 
-	@Override
-	public boolean send(List<JsonEntity> message) {
-		LOGGER.error("Sending message='{}'", message);
-		HttpClient client = HttpClient
+	private final HttpClient client;
+	
+	public GrpcSender() {
+		client = HttpClient
 				.newBuilder()
 				.version(Version.HTTP_2)
 				.build();
+	}
+	
+	GrpcSender(HttpClient client) {
+		this.client = client;
+	}
+
+	@Override
+	public boolean send(List<JsonEntity> message) {
+		LOGGER.error("Sending message='{}'", message);
 		try {
 			byte[] proto = new Protobuf().convert(message);
 			HttpResponse<String> response = client.send(

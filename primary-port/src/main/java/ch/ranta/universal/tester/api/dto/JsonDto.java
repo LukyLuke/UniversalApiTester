@@ -1,5 +1,7 @@
 package ch.ranta.universal.tester.api.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +21,7 @@ public class JsonDto {
 	private Double doubleValue;
 	private Float floatValue;
 	
-	private JsonDto objectValue;
+	private List<JsonDto> objectValue;
 	
 	private Integer int32Value;
 	private Integer uint32Value;
